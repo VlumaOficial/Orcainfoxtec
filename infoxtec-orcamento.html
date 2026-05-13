@@ -276,7 +276,7 @@ table.items td{padding:6px 5px;vertical-align:middle}
     <div class="cfg-row">
       <span class="cfg-lbl">Imposto (%)</span>
       <div class="cfg-rhs">
-        <input type="number" id="cfg-imp" value="0" min="0" max="99" step="0.1" oninput="calcular()">
+        <input type="number" id="cfg-imp" placeholder="0" min="0" max="99" step="0.1" oninput="calcular()">
         <label class="tog" title="Exibir imposto no PDF">
           <input type="checkbox" id="tog-imp" oninput="calcular()">
           <span class="tog-track"><span class="tog-thumb"></span></span>
@@ -289,7 +289,7 @@ table.items td{padding:6px 5px;vertical-align:middle}
     <div class="cfg-row">
       <span class="cfg-lbl">Margem (%)</span>
       <div class="cfg-rhs">
-        <input type="number" id="cfg-marg" value="0" min="0" max="99" step="0.1" oninput="calcular()">
+        <input type="number" id="cfg-marg" placeholder="0" min="0" max="99" step="0.1" oninput="calcular()">
       </div>
     </div>
 
@@ -308,7 +308,7 @@ table.items td{padding:6px 5px;vertical-align:middle}
       <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
         <button class="desc-type-btn active" id="btn-desc-pct" onclick="setDescType('pct')" title="Desconto em percentual">%</button>
         <button class="desc-type-btn" id="btn-desc-fix" onclick="setDescType('fix')" title="Desconto em valor fixo">R$</button>
-        <input type="number" id="cfg-desc" value="0" min="0" step="0.01" style="flex:1;min-width:0;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()">
+        <input type="number" id="cfg-desc" placeholder="0" min="0" step="0.01" style="flex:1;min-width:0;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()">
       </div>
       <div style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--purple);font-weight:600;margin-top:4px;min-height:16px" id="desc-display">— </div>
     </div>
@@ -402,8 +402,8 @@ function addItem() {
   tr.innerHTML = `
     <td style="width:34px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono)">${id}</td>
     <td><input class="ti" type="text" placeholder="Descrição" id="desc-${id}" oninput="calcular()"></td>
-    <td style="width:58px"><input class="ti c" type="number" value="1" min="0" id="qty-${id}" oninput="calcular()"></td>
-    <td style="width:100px"><input class="ti r" type="number" value="0" min="0" step="0.01" id="cunit-${id}" oninput="calcular()"></td>
+    <td style="width:58px"><input class="ti c" type="number" placeholder="1" min="0" id="qty-${id}" oninput="calcular()"></td>
+    <td style="width:100px"><input class="ti r" type="number" placeholder="0,00" min="0" step="0.01" id="cunit-${id}" oninput="calcular()"></td>
     <td><div class="cv" id="ctot-${id}">—</div></td>
     <td><div class="cv" id="cmarg-${id}">—</div></td>
     <td><div class="cv imp" id="cimp-${id}">—</div></td>
