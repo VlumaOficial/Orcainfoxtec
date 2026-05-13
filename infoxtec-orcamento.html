@@ -431,7 +431,7 @@ function calcular() {
     const qEl = document.getElementById("qty-"  + i);
     const cEl = document.getElementById("cunit-"+ i);
     if (!qEl) continue;
-    const r = calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||0, pMarg, pImp);
+    const r = calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp);
     const s = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=fmt(v); };
     s("ctot-" +i, r.custoTotal);
     s("cmarg-"+i, r.comMargem);
@@ -451,7 +451,7 @@ function calcular() {
   const dDisplay  = document.getElementById("desc-display");
   const rowDesc   = document.getElementById("row-desc-res");
   if (descVal > 0) {
-    dDisplay.textContent = "− " + fmt(descVal);
+    dDisplay.textContent = "- " + fmt(descVal);
     rowDesc.style.display = "";
   } else {
     dDisplay.textContent = "—";
@@ -469,12 +469,12 @@ function calcular() {
   document.getElementById("rs-custo").textContent = fmt(tCusto);
   document.getElementById("rs-lucro").textContent = fmt(tLuc);
   document.getElementById("rs-imp").textContent   = fmt(tImp);
-  document.getElementById("rs-desc").textContent  = "− " + fmt(descVal);
+  document.getElementById("rs-desc").textContent  = "- " + fmt(descVal);
   document.getElementById("rs-sug").textContent   = fmt(totalFinal);
   document.getElementById("vc-sug").textContent   = fmt(totalFinal);
 
   valorSugerido = totalFinal;
-  document.getElementById("vc-inp").value = totalFinal.toFixed(2);
+  document.getElementById("vc-inp").value = totalFinal > 0 ? totalFinal.toFixed(2) : "";
   calcularResultado();
 }
 
@@ -491,7 +491,7 @@ function calcularResultado() {
   for (let i=1; i<=itemCount; i++) {
     const qEl=document.getElementById("qty-"+i), cEl=document.getElementById("cunit-"+i);
     if (!qEl) continue;
-    tCusto += calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||0, pMarg, pImp).custoTotal;
+    tCusto += calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp).custoTotal;
   }
   const impostoPago = vc * (pImp / 100);
   const sobra       = vc - impostoPago - tCusto;
@@ -578,7 +578,7 @@ function gerarPDF() {
   for(let i=1;i<=itemCount;i++){
     const dEl=document.getElementById("desc-"+i),qEl=document.getElementById("qty-"+i),cEl=document.getElementById("cunit-"+i);
     if(!dEl) continue;
-    const r=calcItem(parseFloat(cEl.value)||0,parseFloat(qEl.value)||0,pMarg,pImp);
+    const r=calcItem(parseFloat(cEl.value)||0,parseFloat(qEl.value)||1,pMarg,pImp);
     tFinal+=r.total;
     if(showI){
       rows.push([rows.length+1, dEl.value||"--", (parseFloat(qEl.value)||0).toLocaleString("pt-BR"), fmt(r.comMargem), fmt(r.comImposto), fmt(r.total)]);
