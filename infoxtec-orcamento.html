@@ -330,9 +330,11 @@ table.items td{padding:6px 5px;vertical-align:middle}
       <span class="vc-sug-lbl">Sugerido pelo sistema</span>
       <span class="vc-sug-val" id="vc-sug">R$ 0,00</span>
     </div>
-    <div class="vc-iw">
-      <span class="vc-pre">R$</span>
-      <input type="number" class="vc-inp" id="vc-inp" min="0" step="0.01" placeholder="0,00" oninput="calcularResultado()">
+    <div style="position:relative;margin-bottom:8px">
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:13px;color:var(--text3);pointer-events:none;z-index:1">R$</span>
+      <input type="number" id="vc-inp" min="0" step="0.01" placeholder="0,00" oninput="calcularResultado()"
+        style="width:100%;background:var(--navy4);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;font-weight:700;padding:9px 10px 9px 36px;outline:none;transition:border-color .15s;-moz-appearance:textfield"
+        onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border2)'">
     </div>
     <button class="btn-usar" onclick="usarSugerido()">
       <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
