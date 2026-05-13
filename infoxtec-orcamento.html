@@ -308,7 +308,7 @@ table.items td{padding:6px 5px;vertical-align:middle}
       <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
         <button class="desc-type-btn active" id="btn-desc-pct" onclick="setDescType('pct')" title="Desconto em percentual">%</button>
         <button class="desc-type-btn" id="btn-desc-fix" onclick="setDescType('fix')" title="Desconto em valor fixo">R$</button>
-        <input type="number" id="cfg-desc" placeholder="0" min="0" step="0.01" style="flex:1;min-width:0;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()">
+        <input type="text" inputmode="decimal" id="cfg-desc" placeholder="0" style="flex:1;min-width:0;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()" onfocus="this.select()">
       </div>
       <div style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--purple);font-weight:600;margin-top:4px;min-height:16px" id="desc-display">— </div>
     </div>
@@ -387,7 +387,7 @@ function calcItem(custo, qtd, pMarg, pImp) {
 }
 
 function calcDesconto(totalBruto) {
-  const v = parseFloat(document.getElementById("cfg-desc").value) || 0;
+  const v = parseBR(document.getElementById("cfg-desc").value) || 0;
   if (v <= 0) return 0;
   if (descType === "pct") return totalBruto * (v / 100);
   return Math.min(v, totalBruto); // desconto fixo não pode ser maior que o total
@@ -431,7 +431,7 @@ function calcular() {
     const qEl = document.getElementById("qty-"  + i);
     const cEl = document.getElementById("cunit-"+ i);
     if (!qEl) continue;
-    const r = calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp);
+    const r = calcItem(parseBR(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp);
     const s = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=fmt(v); };
     s("ctot-" +i, r.custoTotal);
     s("cmarg-"+i, r.comMargem);
@@ -491,7 +491,7 @@ function calcularResultado() {
   for (let i=1; i<=itemCount; i++) {
     const qEl=document.getElementById("qty-"+i), cEl=document.getElementById("cunit-"+i);
     if (!qEl) continue;
-    tCusto += calcItem(parseFloat(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp).custoTotal;
+    tCusto += calcItem(parseBR(cEl.value)||0, parseFloat(qEl.value)||1, pMarg, pImp).custoTotal;
   }
   const impostoPago = vc * (pImp / 100);
   const sobra       = vc - impostoPago - tCusto;
@@ -515,6 +515,20 @@ function fmt(v) {
 }
 function fmtDate(s) {
   if(!s) return ""; const[y,m,d]=s.split("-"); return d+"/"+m+"/"+y;
+}
+
+// ── FORMATAÇÃO MOEDA NOS INPUTS ──
+function fmtCunit(inp) {
+  const v = parseBR(inp.value);
+  if (v > 0) inp.value = v.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+  else inp.value = "";
+}
+function unfmtCunit(inp) {
+  // Remove formatação para edição
+  const v = parseBR(inp.value);
+  if (v > 0) inp.value = v.toFixed(2).replace(".",",");
+  else inp.value = "";
+  inp.select();
 }
 
 // ── PDF ──
@@ -578,7 +592,7 @@ function gerarPDF() {
   for(let i=1;i<=itemCount;i++){
     const dEl=document.getElementById("desc-"+i),qEl=document.getElementById("qty-"+i),cEl=document.getElementById("cunit-"+i);
     if(!dEl) continue;
-    const r=calcItem(parseFloat(cEl.value)||0,parseFloat(qEl.value)||1,pMarg,pImp);
+    const r=calcItem(parseBR(cEl.value)||0,parseFloat(qEl.value)||1,pMarg,pImp);
     tFinal+=r.total;
     if(showI){
       rows.push([rows.length+1, dEl.value||"--", (parseFloat(qEl.value)||0).toLocaleString("pt-BR"), fmt(r.comMargem), fmt(r.comImposto), fmt(r.total)]);
@@ -662,60 +676,89 @@ function gerarPDF() {
   doc.save("orcamento-"+(document.getElementById("orc-num").value||"infoxtec")+".pdf");
 }
 
-// ── BUG 14/15: garante Delete e setas funcionam nos inputs numéricos ──
-document.addEventListener("DOMContentLoaded", () => {
-  // Reaplica comportamento nativo nos inputs numéricos
-  document.querySelectorAll('input[type="number"]').forEach(inp => {
-    inp.addEventListener("keydown", function(e) {
-      // Delete: limpa o campo
-      if (e.key === "Delete") {
-        e.preventDefault();
-        this.value = "";
-        this.dispatchEvent(new Event("input", {bubbles: true}));
-      }
-    });
+// ── BUGS 14/15/16/17/18 ──
+function getFocusable() {
+  return Array.from(document.querySelectorAll(
+    'input:not([disabled]):not([type="file"]):not([type="checkbox"]), textarea:not([disabled])'
+  )).filter(el => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
   });
+}
 
-  // ── BUG 16: Enter avança para o próximo campo focável ──
+// Formata número para exibição BR
+function fmtInput(v) {
+  if (v === "" || isNaN(v)) return "";
+  return parseFloat(v).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+// Converte string BR para float
+function parseBR(v) {
+  if (!v) return 0;
+  // Remove pontos de milhar, troca vírgula por ponto
+  return parseFloat(v.toString().replace(/\./g,"").replace(",",".")) || 0;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ── BUG 16: Enter navega para próximo campo ──
   document.addEventListener("keydown", function(e) {
     if (e.key !== "Enter") return;
-    // Não intercepta em textarea
     if (e.target.tagName === "TEXTAREA") return;
     e.preventDefault();
-
-    // Lista todos os campos focáveis visíveis
-    const focusable = Array.from(document.querySelectorAll(
-      'input:not([disabled]):not([type="file"]):not([type="checkbox"]), textarea:not([disabled]), button.btn-add'
-    )).filter(el => {
-      const rect = el.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    });
-
-    const idx = focusable.indexOf(e.target);
-    if (idx >= 0 && idx < focusable.length - 1) {
-      focusable[idx + 1].focus();
-      // Se for input numérico, seleciona o conteúdo
-      if (focusable[idx + 1].type === "number" || focusable[idx + 1].type === "text") {
-        focusable[idx + 1].select();
-      }
+    const list = getFocusable();
+    const idx = list.indexOf(e.target);
+    if (idx >= 0 && idx < list.length - 1) {
+      list[idx + 1].focus();
+      setTimeout(() => list[idx + 1].select(), 50);
     }
   });
 
-  // ── BUG 15: setas ▲▼ — observer para novos itens adicionados ──
+  // ── BUG 14: Delete limpa campo ──
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "Delete") return;
+    const t = e.target;
+    if (t.tagName !== "INPUT" && t.tagName !== "TEXTAREA") return;
+    e.preventDefault();
+    t.value = "";
+    t.dispatchEvent(new Event("input", {bubbles: true}));
+  });
+
+  // ── BUG 15: setas nos campos cfg (imposto, margem) ──
+  // Adiciona botões +/- nos campos de configuração
+  ["cfg-imp","cfg-marg"].forEach(id => {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;align-items:center;gap:3px";
+    inp.parentNode.insertBefore(wrap, inp);
+    const btnM = document.createElement("button");
+    btnM.textContent = "−";
+    btnM.style.cssText = "width:22px;height:28px;border-radius:5px;border:1px solid var(--border2);background:var(--navy4);color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
+    const btnP = document.createElement("button");
+    btnP.textContent = "+";
+    btnP.style.cssText = btnM.style.cssText;
+    btnM.onclick = (e) => { e.preventDefault(); inp.value = Math.max(0, (parseFloat(inp.value)||0) - 1); inp.dispatchEvent(new Event("input",{bubbles:true})); };
+    btnP.onclick = (e) => { e.preventDefault(); inp.value = Math.min(99, (parseFloat(inp.value)||0) + 1); inp.dispatchEvent(new Event("input",{bubbles:true})); };
+    wrap.appendChild(btnM);
+    wrap.appendChild(inp);
+    wrap.appendChild(btnP);
+  });
+
+  // Observer para itens da tabela — setas Qtd
   const observer = new MutationObserver(() => {
-    document.querySelectorAll('input[type="number"]').forEach(inp => {
-      if (inp._deleteFixed) return;
-      inp._deleteFixed = true;
-      inp.addEventListener("keydown", function(e) {
-        if (e.key === "Delete") {
-          e.preventDefault();
-          this.value = "";
-          this.dispatchEvent(new Event("input", {bubbles: true}));
-        }
-      });
+    document.querySelectorAll(".qty-spin").forEach(wrap => {
+      if (wrap._spinnered) return;
+      wrap._spinnered = true;
+      const inp = wrap.querySelector("input");
+      const btnM = wrap.querySelector(".spin-m");
+      const btnP = wrap.querySelector(".spin-p");
+      if (btnM) btnM.onclick = (e) => { e.preventDefault(); const v=Math.max(0,(parseInt(inp.value)||1)-1); inp.value=v||""; inp.dispatchEvent(new Event("input",{bubbles:true})); };
+      if (btnP) btnP.onclick = (e) => { e.preventDefault(); inp.value=(parseInt(inp.value)||0)+1; inp.dispatchEvent(new Event("input",{bubbles:true})); };
     });
   });
-  observer.observe(document.getElementById("items-body"), {childList: true});
+  observer.observe(document.getElementById("items-body"), {childList: true, subtree: true});
+
 });
 </script>
 </body>
