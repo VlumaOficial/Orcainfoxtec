@@ -276,9 +276,9 @@ table.items td{padding:6px 5px;vertical-align:middle}
     <div class="cfg-row">
       <span class="cfg-lbl">Imposto (%)</span>
       <div class="cfg-rhs">
-        <input type="number" id="cfg-imp" value="30" min="0" max="99" step="0.1" oninput="calcular()">
+        <input type="number" id="cfg-imp" value="0" min="0" max="99" step="0.1" oninput="calcular()">
         <label class="tog" title="Exibir imposto no PDF">
-          <input type="checkbox" id="tog-imp" checked oninput="calcular()">
+          <input type="checkbox" id="tog-imp" oninput="calcular()">
           <span class="tog-track"><span class="tog-thumb"></span></span>
           PDF
         </label>
@@ -289,7 +289,7 @@ table.items td{padding:6px 5px;vertical-align:middle}
     <div class="cfg-row">
       <span class="cfg-lbl">Margem (%)</span>
       <div class="cfg-rhs">
-        <input type="number" id="cfg-marg" value="15" min="0" max="99" step="0.1" oninput="calcular()">
+        <input type="number" id="cfg-marg" value="0" min="0" max="99" step="0.1" oninput="calcular()">
       </div>
     </div>
 
@@ -588,7 +588,7 @@ function gerarPDF() {
   }
 
   const head = showI
-    ? ["#","Descricao","Qtd","Valor do Produto","C/ Imposto","Total"]
+    ? ["#","Descricao","Qtd","Vl. Produto","Imposto","Total"]
     : ["#","Descricao","Qtd","Total"];
   const cs = showI ? {
     0:{halign:"center",cellWidth:8},
@@ -624,7 +624,7 @@ function gerarPDF() {
       : "Desconto";
     doc.autoTable({startY:y,body:[
       ["Subtotal", fmt(tFinal)],
-      ["(-) "+descLbl, "-"+fmt(descVal)]
+      ["(-) "+descLbl, "- "+fmt(descVal)]
     ],margin:{left:bx,right:mg},tableWidth:bw,
       bodyStyles:{fontSize:8},
       columnStyles:{
