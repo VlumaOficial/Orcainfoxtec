@@ -305,12 +305,12 @@ table.items td{padding:6px 5px;vertical-align:middle}
           </label>
         </div>
       </div>
-      <div class="desc-row-inputs">
+      <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
         <button class="desc-type-btn active" id="btn-desc-pct" onclick="setDescType('pct')" title="Desconto em percentual">%</button>
         <button class="desc-type-btn" id="btn-desc-fix" onclick="setDescType('fix')" title="Desconto em valor fixo">R$</button>
-        <input type="number" id="cfg-desc" value="0" min="0" step="0.01" style="width:80px;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()">
-        <span class="desc-val-display" id="desc-display">— </span>
+        <input type="number" id="cfg-desc" value="0" min="0" step="0.01" style="flex:1;min-width:0;background:var(--navy4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 7px;text-align:right;outline:none;transition:border-color .15s" oninput="calcular()">
       </div>
+      <div style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--purple);font-weight:600;margin-top:4px;min-height:16px" id="desc-display">— </div>
     </div>
 
   </div>
@@ -364,7 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("orc-data").value     = hoje.toISOString().split("T")[0];
   document.getElementById("orc-validade").value = val.toISOString().split("T")[0];
   document.getElementById("orc-num").value       = "ORC-" + hoje.getFullYear() + "-001";
-  addItem(); addItem(); calcular();
+  addItem(); calcular();
 });
 
 // ── TIPO DE DESCONTO ──
@@ -581,18 +581,26 @@ function gerarPDF() {
     const r=calcItem(parseFloat(cEl.value)||0,parseFloat(qEl.value)||0,pMarg,pImp);
     tFinal+=r.total;
     if(showI){
-      rows.push([rows.length+1,dEl.value||"—",(parseFloat(qEl.value)||0).toLocaleString("pt-BR"),fmt(r.comImposto),fmt(r.total)]);
+      rows.push([rows.length+1, dEl.value||"--", (parseFloat(qEl.value)||0).toLocaleString("pt-BR"), fmt(r.comMargem), fmt(r.comImposto), fmt(r.total)]);
     }else{
-      rows.push([rows.length+1,dEl.value||"—",(parseFloat(qEl.value)||0).toLocaleString("pt-BR"),fmt(r.total)]);
+      rows.push([rows.length+1, dEl.value||"--", (parseFloat(qEl.value)||0).toLocaleString("pt-BR"), fmt(r.total)]);
     }
   }
 
-  const head = showI ? ["#","Descrição","Qtd","C/ Imposto","Total"] : ["#","Descrição","Qtd","Total"];
-  const cs   = showI ? {
-    0:{halign:"center",cellWidth:8},1:{halign:"left"},2:{halign:"center",cellWidth:14},
-    3:{halign:"right",cellWidth:28},4:{halign:"right",cellWidth:28,fontStyle:"bold"}
+  const head = showI
+    ? ["#","Descricao","Qtd","Valor do Produto","C/ Imposto","Total"]
+    : ["#","Descricao","Qtd","Total"];
+  const cs = showI ? {
+    0:{halign:"center",cellWidth:8},
+    1:{halign:"left"},
+    2:{halign:"center",cellWidth:12},
+    3:{halign:"right",cellWidth:27},
+    4:{halign:"right",cellWidth:25},
+    5:{halign:"right",cellWidth:25,fontStyle:"bold"}
   } : {
-    0:{halign:"center",cellWidth:8},1:{halign:"left"},2:{halign:"center",cellWidth:14},
+    0:{halign:"center",cellWidth:8},
+    1:{halign:"left"},
+    2:{halign:"center",cellWidth:14},
     3:{halign:"right",cellWidth:28,fontStyle:"bold"}
   };
 
@@ -616,7 +624,7 @@ function gerarPDF() {
       : "Desconto";
     doc.autoTable({startY:y,body:[
       ["Subtotal", fmt(tFinal)],
-      ["(−) "+descLbl, "− "+fmt(descVal)]
+      ["(-) "+descLbl, "-"+fmt(descVal)]
     ],margin:{left:bx,right:mg},tableWidth:bw,
       bodyStyles:{fontSize:8},
       columnStyles:{
