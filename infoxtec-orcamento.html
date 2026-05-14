@@ -155,6 +155,10 @@ table.items td{padding:5px 4px;vertical-align:middle}
 .rb-val.bad{color:var(--red)}
 .rb-msg{font-size:10px;color:var(--text3);text-align:center;margin-top:4px}
 .page-footer{text-align:center;padding:1rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+/* Remove setas nativas dos campos numéricos com botões custom */
+.cfg-num::-webkit-outer-spin-button,
+.cfg-num::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.cfg-num { -moz-appearance:textfield; }
 </style>
 </head>
 <body>
@@ -286,7 +290,10 @@ table.items td{padding:5px 4px;vertical-align:middle}
       <div class="desc-inputs">
         <button class="desc-type active" id="btn-pct" onclick="setDescType('pct')">%</button>
         <button class="desc-type" id="btn-fix" onclick="setDescType('fix')">R$</button>
-        <input type="text" inputmode="decimal" class="desc-val-inp" id="cfg-desc" placeholder="0" oninput="calcular()">
+        <input type="text" inputmode="decimal" class="desc-val-inp" id="cfg-desc" placeholder="0"
+          oninput="calcular()"
+          onblur="if(descType==='fix'){{var v=parseBR(this.value);this.value=v>0?v.toLocaleString('pt-BR',{{minimumFractionDigits:2,maximumFractionDigits:2}}):'';}}"
+          onfocus="if(descType==='fix'){{var v=parseBR(this.value);this.value=v>0?v.toString().replace('.',','):'';}};this.select();">
       </div>
       <div class="desc-display" id="desc-display"></div>
     </div>
@@ -404,10 +411,14 @@ function addItem() {
       </div>
     </td>
     <td style="width:108px">
-      <input class="ti r" type="text" inputmode="decimal" id="cunit-${id}" placeholder="0,00"
-        oninput="calcular()"
-        onblur="this.value=parseBR(this.value)>0?parseBR(this.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'';"
-        onfocus="var v=parseBR(this.value);this.value=v>0?v.toString().replace('.',','):'';this.select();">
+      <div style="position:relative">
+        <span style="position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-family:var(--mono);pointer-events:none;z-index:1">R$</span>
+        <input class="ti r" type="text" inputmode="decimal" id="cunit-${id}" placeholder="0,00"
+          style="padding-left:26px !important"
+          oninput="calcular()"
+          onblur="this.value=parseBR(this.value)>0?parseBR(this.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'';"
+          onfocus="var v=parseBR(this.value);this.value=v>0?v.toString().replace('.',','):'';this.select();">
+      </div>
     </td>
     <td><div class="cv" id="ctot-${id}">—</div></td>
     <td><div class="cv" id="cmarg-${id}">—</div></td>
