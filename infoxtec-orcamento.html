@@ -62,7 +62,7 @@ body{font-family:"Inter",sans-serif;background:var(--navy);color:var(--text);min
 .f textarea{resize:vertical;min-height:68px}
 /* TABELA */
 .tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
-table.items{width:100%;border-collapse:collapse;min-width:900px}
+table.items{width:100%;border-collapse:collapse;min-width:900px;table-layout:fixed}
 table.items thead tr{background:var(--navy3)}
 table.items th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:10px 8px;border-bottom:1px solid var(--border2);white-space:nowrap;text-align:right}
 table.items th.l{text-align:left}
@@ -71,7 +71,7 @@ table.items tbody tr{border-bottom:1px solid var(--border)}
 table.items tbody tr:last-child{border-bottom:none}
 table.items tbody tr:hover{background:rgba(255,255,255,.02)}
 table.items td{padding:5px 4px;vertical-align:middle}
-.ti{background:var(--navy3);border:1px solid transparent;border-radius:6px;color:var(--text);font-size:12px;padding:6px 8px;width:100%;outline:none;transition:border-color .15s;font-family:"Inter",sans-serif}
+.ti{background:var(--navy3);border:1px solid transparent;border-radius:6px;color:var(--text);font-size:12px;padding:6px 8px;width:100%;outline:none;transition:border-color .15s;font-family:"Inter",sans-serif;overflow:hidden;text-overflow:ellipsis}
 .ti:focus{border-color:var(--green)}
 .ti.r{text-align:right;font-family:var(--mono)}
 .ti.c{text-align:center}
@@ -156,12 +156,14 @@ table.items td{padding:5px 4px;vertical-align:middle}
 .rb-msg{font-size:10px;color:var(--text3);text-align:center;margin-top:4px}
 .page-footer{text-align:center;padding:1rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
 /* Checkbox item */
-.item-chk{display:flex;align-items:center;justify-content:center}
-.item-chk input{display:none}
-.item-chk label{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);background:var(--navy4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:11px;color:transparent}
-.item-chk input:checked + label{background:var(--green);border-color:var(--green);color:#fff}
-.item-chk input:checked + label::after{content:"✓"}
-.item-chk label::after{content:"✓"}
+.item-chk{display:flex;align-items:center;justify-content:center;gap:4px}
+.item-chk input[type="checkbox"]{display:none}
+.item-chk label{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);background:var(--navy4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:11px;flex-shrink:0}
+.item-chk input[type="checkbox"]:checked + label{background:var(--green);border-color:var(--green)}
+.item-chk input[type="checkbox"]:checked + label::after{content:"✓";color:#fff}
+.item-chk label::after{content:""}
+.marg-inp{width:46px;background:var(--navy3);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 5px;text-align:right;outline:none;transition:border-color .15s}
+.marg-inp:focus{border-color:var(--green)}
 /* Remove setas nativas dos campos numéricos com botões custom */
 .cfg-num::-webkit-outer-spin-button,
 .cfg-num::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
@@ -223,11 +225,10 @@ table.items td{padding:5px 4px;vertical-align:middle}
       <table class="items">
         <thead><tr>
           <th style="width:32px;text-align:center">#</th>
-          <th class="l" style="min-width:150px">Descrição</th>
+          <th class="l" style="min-width:150px;max-width:220px;width:220px">Descrição</th>
           <th class="c" style="width:92px">Qtd</th>
           <th style="width:108px">Custo Unit.</th>
-          <th style="width:46px;text-align:center" title="Aplicar imposto neste item">Imp</th>
-          <th style="width:46px;text-align:center" title="Aplicar margem neste item">Marg</th>
+          <th style="width:100px;text-align:center" title="Margem por item">Margem</th>
           <th style="width:100px">Custo Total</th>
           <th style="width:100px">C/ Margem</th>
           <th style="width:100px">C/ Imposto</th>
@@ -238,8 +239,7 @@ table.items td{padding:5px 4px;vertical-align:middle}
         <tbody id="items-body"></tbody>
       </table>
       <div class="tbl-foot">
-        <div style="width:46px"></div>
-        <div style="width:46px"></div>
+        <div style="width:100px"></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">Custo Total</div><div class="tf-val" id="tf-ct">—</div></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">C/ Margem</div><div class="tf-val" id="tf-cm">—</div></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">C/ Imposto</div><div class="tf-val imp" id="tf-ci">—</div></div>
@@ -372,6 +372,20 @@ function fmtDate(s) {
 }
 
 // ── FÓRMULAS ──
+function toggleMarg(id) {
+  const chk = document.getElementById("marg-" + id);
+  const inp = document.getElementById("margval-" + id);
+  if (!chk || !inp) return;
+  if (chk.checked) {
+    inp.style.display = "none";
+    inp.value = "";
+  } else {
+    inp.style.display = "block";
+    setTimeout(() => inp.focus(), 50);
+  }
+  calcular();
+}
+
 function calcItem(custo, qtd, pMarg, pImp) {
   const custoTotal = custo * qtd;
   const comMargem  = custoTotal * (1 + pMarg / 100);
@@ -413,7 +427,11 @@ function addItem() {
   tr.id = "item-" + id;
   tr.innerHTML = `
     <td style="width:32px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono)">${id}</td>
-    <td><input class="ti" type="text" placeholder="Descrição do item / serviço" id="desc-${id}" oninput="calcular()"></td>
+    <td style="max-width:220px;width:220px">
+      <input class="ti" type="text" placeholder="Descrição do item / serviço" id="desc-${id}" oninput="calcular();this.title=this.value"
+        style="width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+        title="">
+    </td>
     <td style="width:92px">
       <div class="spin-wrap">
         <button type="button" class="spin-btn" data-id="${id}" data-dir="-1">-</button>
@@ -431,16 +449,13 @@ function addItem() {
           onfocus="var v=parseBR(this.value);this.value=v>0?v.toString().replace('.',','):'';this.select();">
       </div>
     </td>
-    <td style="width:46px">
+    <td style="width:100px">
       <div class="item-chk">
-        <input type="checkbox" id="imp-${id}" checked onchange="calcular()">
-        <label for="imp-${id}" title="Aplicar imposto neste item"></label>
-      </div>
-    </td>
-    <td style="width:46px">
-      <div class="item-chk">
-        <input type="checkbox" id="marg-${id}" checked onchange="calcular()">
-        <label for="marg-${id}" title="Aplicar margem neste item"></label>
+        <input type="checkbox" id="marg-${id}" checked onchange="toggleMarg(${id})">
+        <label for="marg-${id}" title="Usar margem global"></label>
+        <input type="number" class="marg-inp" id="margval-${id}" placeholder="%" min="0" max="99" step="0.1"
+          style="display:none" oninput="calcular()"
+          onfocus="this.select()">
       </div>
     </td>
     <td><div class="cv" id="ctot-${id}">—</div></td>
@@ -474,9 +489,10 @@ function calcular() {
     if (!qEl) continue;
     const qty    = parseFloat(qEl.value) || 1;
     const custo  = parseBR(cEl.value);
-    const useImp = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
-    const useMarg= document.getElementById("marg-" + i)?.checked ? pMarg : 0;
-    const r      = calcItem(custo, qty, useMarg, useImp);
+    const margChk = document.getElementById("marg-" + i);
+    const margVal = document.getElementById("margval-" + i);
+    const useMarg = margChk?.checked ? pMarg : (parseFloat(margVal?.value) || 0);
+    const r       = calcItem(custo, qty, useMarg, pImp);
     const set = (sid, v) => { const el = document.getElementById(sid); if (el) el.textContent = custo > 0 ? fmt(v) : "—"; };
     set("ctot-"  + i, r.custoTotal);
     set("cmarg-" + i, r.comMargem);
@@ -535,9 +551,10 @@ function calcularResultado() {
     const qEl = document.getElementById("qty-"   + i);
     const cEl = document.getElementById("cunit-" + i);
     if (!qEl) continue;
-    const useImpR  = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
-    const useMargR = document.getElementById("marg-" + i)?.checked ? pMarg : 0;
-    tCusto += calcItem(parseBR(cEl.value), parseFloat(qEl.value)||1, useMargR, useImpR).custoTotal;
+    const margChkR = document.getElementById("marg-" + i);
+    const margValR = document.getElementById("margval-" + i);
+    const useMargR = margChkR?.checked ? pMarg : (parseFloat(margValR?.value) || 0);
+    tCusto += calcItem(parseBR(cEl.value), parseFloat(qEl.value)||1, useMargR, pImp).custoTotal;
   }
   const sobra = vc - vc*(pImp/100) - tCusto;
   const box = document.getElementById("res-box");
@@ -672,9 +689,10 @@ function gerarPDF() {
     const custo = parseBR(cEl.value);
     if (custo === 0) continue;
     const qty      = parseFloat(qEl.value)||1;
-    const useImpP  = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
-    const useMargP = document.getElementById("marg-" + i)?.checked ? pMarg : 0;
-    const r   = calcItem(custo, qty, useMargP, useImpP);
+    const margChkP = document.getElementById("marg-" + i);
+    const margValP = document.getElementById("margval-" + i);
+    const useMargP = margChkP?.checked ? pMarg : (parseFloat(margValP?.value) || 0);
+    const r   = calcItem(custo, qty, useMargP, pImp);
     tFinal += r.total;
     if (showI) {
       rows.push([rows.length+1, dEl.value||"--", qty.toLocaleString("pt-BR"), fmt(r.comMargem), fmt(r.comImposto), fmt(r.total)]);
