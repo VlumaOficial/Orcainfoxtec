@@ -155,6 +155,13 @@ table.items td{padding:5px 4px;vertical-align:middle}
 .rb-val.bad{color:var(--red)}
 .rb-msg{font-size:10px;color:var(--text3);text-align:center;margin-top:4px}
 .page-footer{text-align:center;padding:1rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+/* Checkbox item */
+.item-chk{display:flex;align-items:center;justify-content:center}
+.item-chk input{display:none}
+.item-chk label{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);background:var(--navy4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:11px;color:transparent}
+.item-chk input:checked + label{background:var(--green);border-color:var(--green);color:#fff}
+.item-chk input:checked + label::after{content:"✓"}
+.item-chk label::after{content:"✓"}
 /* Remove setas nativas dos campos numéricos com botões custom */
 .cfg-num::-webkit-outer-spin-button,
 .cfg-num::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
@@ -219,6 +226,8 @@ table.items td{padding:5px 4px;vertical-align:middle}
           <th class="l" style="min-width:150px">Descrição</th>
           <th class="c" style="width:92px">Qtd</th>
           <th style="width:108px">Custo Unit.</th>
+          <th style="width:46px;text-align:center" title="Aplicar imposto neste item">Imp</th>
+          <th style="width:46px;text-align:center" title="Aplicar margem neste item">Marg</th>
           <th style="width:100px">Custo Total</th>
           <th style="width:100px">C/ Margem</th>
           <th style="width:100px">C/ Imposto</th>
@@ -229,6 +238,8 @@ table.items td{padding:5px 4px;vertical-align:middle}
         <tbody id="items-body"></tbody>
       </table>
       <div class="tbl-foot">
+        <div style="width:46px"></div>
+        <div style="width:46px"></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">Custo Total</div><div class="tf-val" id="tf-ct">—</div></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">C/ Margem</div><div class="tf-val" id="tf-cm">—</div></div>
         <div class="tf" style="width:100px"><div class="tf-lbl">C/ Imposto</div><div class="tf-val imp" id="tf-ci">—</div></div>
@@ -420,6 +431,18 @@ function addItem() {
           onfocus="var v=parseBR(this.value);this.value=v>0?v.toString().replace('.',','):'';this.select();">
       </div>
     </td>
+    <td style="width:46px">
+      <div class="item-chk">
+        <input type="checkbox" id="imp-${id}" checked onchange="calcular()">
+        <label for="imp-${id}" title="Aplicar imposto neste item"></label>
+      </div>
+    </td>
+    <td style="width:46px">
+      <div class="item-chk">
+        <input type="checkbox" id="marg-${id}" checked onchange="calcular()">
+        <label for="marg-${id}" title="Aplicar margem neste item"></label>
+      </div>
+    </td>
     <td><div class="cv" id="ctot-${id}">—</div></td>
     <td><div class="cv" id="cmarg-${id}">—</div></td>
     <td><div class="cv imp" id="cimp-${id}">—</div></td>
@@ -449,9 +472,11 @@ function calcular() {
     const qEl = document.getElementById("qty-"   + i);
     const cEl = document.getElementById("cunit-" + i);
     if (!qEl) continue;
-    const qty   = parseFloat(qEl.value) || 1;
-    const custo = parseBR(cEl.value);
-    const r     = calcItem(custo, qty, pMarg, pImp);
+    const qty    = parseFloat(qEl.value) || 1;
+    const custo  = parseBR(cEl.value);
+    const useImp = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
+    const useMarg= document.getElementById("marg-" + i)?.checked ? pMarg : 0;
+    const r      = calcItem(custo, qty, useMarg, useImp);
     const set = (sid, v) => { const el = document.getElementById(sid); if (el) el.textContent = custo > 0 ? fmt(v) : "—"; };
     set("ctot-"  + i, r.custoTotal);
     set("cmarg-" + i, r.comMargem);
@@ -510,7 +535,9 @@ function calcularResultado() {
     const qEl = document.getElementById("qty-"   + i);
     const cEl = document.getElementById("cunit-" + i);
     if (!qEl) continue;
-    tCusto += calcItem(parseBR(cEl.value), parseFloat(qEl.value)||1, pMarg, pImp).custoTotal;
+    const useImpR  = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
+    const useMargR = document.getElementById("marg-" + i)?.checked ? pMarg : 0;
+    tCusto += calcItem(parseBR(cEl.value), parseFloat(qEl.value)||1, useMargR, useImpR).custoTotal;
   }
   const sobra = vc - vc*(pImp/100) - tCusto;
   const box = document.getElementById("res-box");
@@ -644,8 +671,10 @@ function gerarPDF() {
     if (!dEl) continue;
     const custo = parseBR(cEl.value);
     if (custo === 0) continue;
-    const qty = parseFloat(qEl.value)||1;
-    const r   = calcItem(custo, qty, pMarg, pImp);
+    const qty      = parseFloat(qEl.value)||1;
+    const useImpP  = document.getElementById("imp-"  + i)?.checked ? pImp  : 0;
+    const useMargP = document.getElementById("marg-" + i)?.checked ? pMarg : 0;
+    const r   = calcItem(custo, qty, useMargP, useImpP);
     tFinal += r.total;
     if (showI) {
       rows.push([rows.length+1, dEl.value||"--", qty.toLocaleString("pt-BR"), fmt(r.comMargem), fmt(r.comImposto), fmt(r.total)]);
