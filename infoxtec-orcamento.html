@@ -62,7 +62,7 @@ body{font-family:"Inter",sans-serif;background:var(--navy);color:var(--text);min
 .f textarea{resize:vertical;min-height:68px}
 /* TABELA */
 .tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
-table.items{width:100%;border-collapse:collapse;min-width:900px;table-layout:fixed}
+table.items{width:100%;border-collapse:collapse;min-width:900px}
 table.items thead tr{background:var(--navy3)}
 table.items th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:10px 8px;border-bottom:1px solid var(--border2);white-space:nowrap;text-align:right}
 table.items th.l{text-align:left}
@@ -71,7 +71,7 @@ table.items tbody tr{border-bottom:1px solid var(--border)}
 table.items tbody tr:last-child{border-bottom:none}
 table.items tbody tr:hover{background:rgba(255,255,255,.02)}
 table.items td{padding:5px 4px;vertical-align:middle}
-.ti{background:var(--navy3);border:1px solid transparent;border-radius:6px;color:var(--text);font-size:12px;padding:6px 8px;width:100%;outline:none;transition:border-color .15s;font-family:"Inter",sans-serif;overflow:hidden;text-overflow:ellipsis}
+.ti{background:var(--navy3);border:1px solid transparent;border-radius:6px;color:var(--text);font-size:12px;padding:6px 8px;width:100%;outline:none;transition:border-color .15s;font-family:"Inter",sans-serif}
 .ti:focus{border-color:var(--green)}
 .ti.r{text-align:right;font-family:var(--mono)}
 .ti.c{text-align:center}
@@ -225,7 +225,7 @@ table.items td{padding:5px 4px;vertical-align:middle}
       <table class="items">
         <thead><tr>
           <th style="width:32px;text-align:center">#</th>
-          <th class="l" style="min-width:150px;max-width:220px;width:220px">Descrição</th>
+          <th class="l" style="min-width:200px">Descrição</th>
           <th class="c" style="width:92px">Qtd</th>
           <th style="width:108px">Custo Unit.</th>
           <th style="width:46px;text-align:center" title="Aplicar imposto neste item">Imp</th>
@@ -273,9 +273,7 @@ table.items td{padding:5px 4px;vertical-align:middle}
     <div class="cfg-row">
       <span class="cfg-lbl">Imposto (%)</span>
       <div class="cfg-rhs">
-        <button class="cfg-spin" onclick="stepCfg('cfg-imp',-1)">-</button>
         <input type="number" class="cfg-num" id="cfg-imp" placeholder="0" min="0" max="99" step="1" oninput="calcular()">
-        <button class="cfg-spin" onclick="stepCfg('cfg-imp',1)">+</button>
         <label class="tog">
           <input type="checkbox" id="tog-imp" onchange="calcular()">
           <span class="tog-track"><span class="tog-thumb"></span></span>
@@ -427,10 +425,8 @@ function addItem() {
   tr.id = "item-" + id;
   tr.innerHTML = `
     <td style="width:32px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono)">${id}</td>
-    <td style="max-width:220px;width:220px">
-      <input class="ti" type="text" placeholder="Descrição do item / serviço" id="desc-${id}" oninput="calcular();this.title=this.value"
-        style="width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-        title="">
+     <td>
+      <input class="ti" type="text" placeholder="Descrição do item / serviço" id="desc-${id}" oninput="calcular()">
     </td>
     <td style="width:92px">
       <div class="spin-wrap">
