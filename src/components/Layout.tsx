@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside
         className={
-          "fixed md:static z-40 top-0 left-0 h-full w-60 border-r border-[var(--border)] bg-[var(--navy)] flex flex-col p-5 transition-transform " +
+          "fixed md:static z-40 top-0 left-0 h-screen w-60 border-r border-[var(--border)] bg-[var(--navy)] flex flex-col p-5 transition-transform " +
           (menuAberto ? "translate-x-0" : "-translate-x-full md:translate-x-0")
         }
       >
