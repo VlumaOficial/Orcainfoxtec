@@ -1,24 +1,27 @@
 import Layout from '../components/Layout'
+import EmitCard from '../components/EmitCard'
 import { useNovoOrcamento } from '../hooks/useNovoOrcamento'
+import type { CSSProperties } from 'react'
+
+const sectionStyle: CSSProperties = {
+  background: 'var(--navy2)',
+  border: '1px solid var(--border)',
+  borderRadius: '14px',
+  padding: '1.25rem 1.5rem',
+}
 
 export default function NovoOrcamento() {
   const { cabecalho, atualizarCampo, carregandoNumero } = useNovoOrcamento()
 
   return (
     <Layout>
-      <h1 className="text-[var(--text)] text-2xl font-semibold mb-1">
-        Novo Orcamento
-      </h1>
-      <p className="text-[var(--text2)] text-sm mb-6">
-        Preencha os dados do orcamento
-      </p>
+      <EmitCard />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-        {/* Coluna esquerda - formulario */}
-        <div className="flex flex-col gap-6 min-w-0">
-          <div className="bg-[var(--navy2)] border border-[var(--border)] rounded-xl p-5">
+        <div className="flex flex-col gap-5 min-w-0">
+          <div style={sectionStyle}>
             <h2 className="text-[var(--text)] text-sm font-semibold uppercase tracking-wide mb-4">
-              Identificacao
+              Identificacao do Orcamento
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
@@ -82,16 +85,16 @@ export default function NovoOrcamento() {
             </div>
           </div>
 
-          <div className="bg-[var(--navy2)] border border-[var(--border)] rounded-xl p-5">
+          <div style={sectionStyle}>
             <h2 className="text-[var(--text)] text-sm font-semibold uppercase tracking-wide mb-4">
-              Itens / Servicos
+              Itens e Servicos
             </h2>
             <p className="text-[var(--text3)] text-sm">
-              Tabela de itens - em breve (etapa 5.3)
+              Tabela de itens - em breve
             </p>
           </div>
 
-          <div className="bg-[var(--navy2)] border border-[var(--border)] rounded-xl p-5">
+          <div style={sectionStyle}>
             <h2 className="text-[var(--text)] text-sm font-semibold uppercase tracking-wide mb-4">
               Observacoes e Condicoes
             </h2>
@@ -124,14 +127,22 @@ export default function NovoOrcamento() {
           </div>
         </div>
 
-        {/* Coluna direita - resumo financeiro (fixo no scroll, desktop) */}
-        <div className="lg:sticky lg:top-6 self-start">
-          <div className="bg-[var(--navy2)] border border-[var(--border)] rounded-xl p-5">
-            <h2 className="text-[var(--text)] text-sm font-semibold uppercase tracking-wide mb-4">
+        <div className="lg:sticky lg:top-6 self-start flex flex-col gap-5">
+          <div style={sectionStyle}>
+            <h2 className="text-[var(--text3)] text-xs font-bold uppercase tracking-widest mb-3">
+              Configuracoes
+            </h2>
+            <p className="text-[var(--text3)] text-sm">
+              Imposto, margem, desconto - em breve
+            </p>
+          </div>
+
+          <div style={sectionStyle}>
+            <h2 className="text-[var(--text3)] text-xs font-bold uppercase tracking-widest mb-3">
               Resumo
             </h2>
             <p className="text-[var(--text3)] text-sm">
-              Configuracoes e totais - em breve (etapa 5.5)
+              Totais e resultado - em breve
             </p>
           </div>
         </div>
