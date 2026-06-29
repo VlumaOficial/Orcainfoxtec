@@ -102,11 +102,11 @@ export default function ItensTable({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[1098px]">
+        <table className="w-full text-sm min-w-[900px]">
           <thead>
             <tr className="border-b text-left" style={{ borderColor: 'var(--border)' }}>
               <th style={{ width: '28px' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2">#</th>
-              <th style={{ minWidth: '150px', width: '30%' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2 px-2">Descricao</th>
+              <th style={{ maxWidth: 0, width: '30%' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2 px-2">Descricao</th>
               <th style={{ width: '72px' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2 px-2 text-center">Qtd</th>
               <th style={{ width: '90px' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2 px-2">Custo Unit.</th>
               <th style={{ width: '120px' }} className="text-[var(--text3)] text-[10px] uppercase tracking-wide py-2 px-2 text-center">Imp - Marg - Desc</th>
@@ -238,12 +238,12 @@ export default function ItensTable({
                       </div>
                     </div>
                   </td>
-                  <td className="py-2 px-2 text-right text-[var(--text2)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(custoTotal) : '\u2014'}</td>
-                  <td className="py-2 px-2 text-right text-[var(--text2)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(precoTabela) : '\u2014'}</td>
-                  <td className="py-2 px-2 text-right text-[var(--purple)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(descVal) : '\u2014'}</td>
-                  <td className="py-2 px-2 text-right text-[var(--red)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(comImposto) : '\u2014'}</td>
-                  <td className="py-2 px-2 text-right text-[var(--amber)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? (lucro < 0 ? '- ' + fmtBR(Math.abs(lucro)) : fmtBR(lucro)) : '\u2014'}</td>
-                  <td className="py-2 px-2 text-right text-[var(--green)] font-semibold text-[13px] whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(total) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--text2)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(custoTotal) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--text2)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(precoTabela) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--purple)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(descVal) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--red)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(comImposto) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--amber)] text-xs whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? (lucro < 0 ? '- ' + fmtBR(Math.abs(lucro)) : fmtBR(lucro)) : '\u2014'}</td>
+                  <td className="py-1.5 px-1 text-right text-[var(--green)] font-semibold text-[13px] whitespace-nowrap" style={{ fontFamily: 'var(--mono)' }}>{custoTotal > 0 ? fmtBR(total) : '\u2014'}</td>
                   <td className="py-2">
                     <button
                       type="button"
