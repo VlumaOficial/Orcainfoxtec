@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import Layout from '../components/Layout'
 import EmitCard from '../components/EmitCard'
 import ClienteSection from '../components/ClienteSection'
@@ -41,7 +40,21 @@ function SectionHeader({ children, color }: { children: ReactNode; color: 'g' | 
 }
 
 export default function NovoOrcamento() {
-  const { cabecalho, atualizarCampo, cliente, atualizarCliente, carregandoNumero } = useNovoOrcamento()
+  const {
+    cabecalho,
+    atualizarCampo,
+    cliente,
+    atualizarCliente,
+    clienteVinculado,
+    clienteBusca,
+    setClienteBusca,
+    clienteAvulso,
+    selecionarClienteExistente,
+    cadastrarClienteNovo,
+    usarClienteAvulso,
+    desvincularCliente,
+    carregandoNumero,
+  } = useNovoOrcamento()
 
   return (
     <Layout>
@@ -61,6 +74,14 @@ export default function NovoOrcamento() {
             responsavel={cliente.responsavel}
             emailTelefone={cliente.emailTelefone}
             onChange={atualizarCliente}
+            clienteVinculado={clienteVinculado}
+            clienteAvulso={clienteAvulso}
+            clienteBusca={clienteBusca}
+            onBuscar={setClienteBusca}
+            onSelecionar={selecionarClienteExistente}
+            onCadastrarNovo={cadastrarClienteNovo}
+            onUsarAvulso={usarClienteAvulso}
+            onDesvincular={desvincularCliente}
           />
 
           <div style={sectionStyle}>

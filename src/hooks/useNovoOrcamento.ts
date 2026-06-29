@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import type { Cliente } from './useClientes'
 
 export interface DadosCliente {
   nome: string
@@ -50,6 +51,10 @@ export function useNovoOrcamento() {
     emailTelefone: '',
   })
 
+  const [clienteVinculado, setClienteVinculado] = useState<Cliente | null>(null)
+  const [clienteBusca, setClienteBusca] = useState('')
+  const [clienteAvulso, setClienteAvulso] = useState(false)
+
   const [carregandoNumero, setCarregandoNumero] = useState(true)
 
   useEffect(() => {
@@ -91,11 +96,51 @@ export function useNovoOrcamento() {
     setCliente((prev) => ({ ...prev, [campo]: valor }))
   }
 
+  function selecionarClienteExistente(c: Cliente) {
+    setClienteVinculado(c)
+    setClienteAvulso(false)
+    setClienteBusca(c.nome)
+    setCliente({
+      nome: c.nome,
+      cnpj: c.cnpj || '',
+      endereco: c.endereco || '',
+      responsavel: c.responsavel || '',
+      emailTelefone: c.email || c.telefone || '',
+    })
+  }
+
+  function cadastrarClienteNovo(nome: string) {
+    setClienteVinculado(null)
+    setClienteAvulso(false)
+    setCliente((prev) => ({ ...prev, nome }))
+  }
+
+  function usarClienteAvulso(nome: string) {
+    setClienteVinculado(null)
+    setClienteAvulso(true)
+    setCliente((prev) => ({ ...prev, nome }))
+  }
+
+  function desvincularCliente() {
+    setClienteVinculado(null)
+    setClienteAvulso(false)
+    setClienteBusca('')
+    setCliente({ nome: '', cnpj: '', endereco: '', responsavel: '', emailTelefone: '' })
+  }
+
   return {
     cabecalho,
     atualizarCampo,
     cliente,
     atualizarCliente,
+    clienteVinculado,
+    clienteBusca,
+    setClienteBusca,
+    clienteAvulso,
+    selecionarClienteExistente,
+    cadastrarClienteNovo,
+    usarClienteAvulso,
+    desvincularCliente,
     carregandoNumero,
   }
 }

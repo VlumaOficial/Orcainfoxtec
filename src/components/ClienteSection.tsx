@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react'
+import ClienteCombobox from './ClienteCombobox'
+import type { Cliente } from '../hooks/useClientes'
 
 const sectionStyle: CSSProperties = {
   background: 'var(--navy2)',
@@ -22,9 +24,34 @@ interface Props {
   responsavel: string
   emailTelefone: string
   onChange: (campo: string, valor: string) => void
+  clienteVinculado: Cliente | null
+  clienteAvulso: boolean
+  clienteBusca: string
+  onBuscar: (texto: string) => void
+  onSelecionar: (cliente: Cliente) => void
+  onCadastrarNovo: (nome: string) => void
+  onUsarAvulso: (nome: string) => void
+  onDesvincular: () => void
 }
 
-export default function ClienteSection({ nome, cnpj, endereco, responsavel, emailTelefone, onChange }: Props) {
+export default function ClienteSection({
+  nome,
+  cnpj,
+  endereco,
+  responsavel,
+  emailTelefone,
+  onChange,
+  clienteVinculado,
+  clienteAvulso,
+  clienteBusca,
+  onBuscar,
+  onSelecionar,
+  onCadastrarNovo,
+  onUsarAvulso,
+  onDesvincular,
+}: Props) {
+  const bloqueado = !!clienteVinculado
+
   return (
     <div style={sectionStyle}>
       <div className="flex items-center gap-2 mb-4">
@@ -39,6 +66,26 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
         <span className="font-sora font-semibold text-[13px] text-[var(--text)]">
           Dados do Cliente
         </span>
+        {clienteAvulso && (
+          <span className="text-[10px] text-[var(--amber)] bg-[var(--amber-dim)] px-2 py-0.5 rounded-full ml-auto">
+            Avulso - nao cadastrado
+          </span>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <label className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text3)] block mb-1">
+          Buscar cliente
+        </label>
+        <ClienteCombobox
+          valorBusca={clienteVinculado ? clienteVinculado.nome : clienteBusca}
+          clienteVinculado={clienteVinculado}
+          onBuscar={onBuscar}
+          onSelecionar={onSelecionar}
+          onCadastrarNovo={onCadastrarNovo}
+          onUsarAvulso={onUsarAvulso}
+          onDesvincular={onDesvincular}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -50,8 +97,8 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
             type="text"
             value={nome}
             onChange={(e) => onChange('nome', e.target.value)}
-            placeholder="Empresa Cliente Ltda"
-            style={inputStyle}
+            readOnly={bloqueado}
+            style={{ ...inputStyle, opacity: bloqueado ? 0.7 : 1 }}
             className="px-[11px] py-2 text-[var(--text)] outline-none focus:border-[var(--green)] w-full"
           />
         </div>
@@ -64,8 +111,9 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
             type="text"
             value={cnpj}
             onChange={(e) => onChange('cnpj', e.target.value)}
+            readOnly={bloqueado}
             placeholder="00.000.000/0000-00"
-            style={inputStyle}
+            style={{ ...inputStyle, opacity: bloqueado ? 0.7 : 1 }}
             className="px-[11px] py-2 text-[var(--text)] outline-none focus:border-[var(--green)] w-full"
           />
         </div>
@@ -78,8 +126,9 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
             type="text"
             value={endereco}
             onChange={(e) => onChange('endereco', e.target.value)}
+            readOnly={bloqueado}
             placeholder="Rua, numero, bairro, cidade - UF"
-            style={inputStyle}
+            style={{ ...inputStyle, opacity: bloqueado ? 0.7 : 1 }}
             className="px-[11px] py-2 text-[var(--text)] outline-none focus:border-[var(--green)] w-full"
           />
         </div>
@@ -92,8 +141,9 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
             type="text"
             value={responsavel}
             onChange={(e) => onChange('responsavel', e.target.value)}
+            readOnly={bloqueado}
             placeholder="Nome do responsavel"
-            style={inputStyle}
+            style={{ ...inputStyle, opacity: bloqueado ? 0.7 : 1 }}
             className="px-[11px] py-2 text-[var(--text)] outline-none focus:border-[var(--green)] w-full"
           />
         </div>
@@ -106,8 +156,9 @@ export default function ClienteSection({ nome, cnpj, endereco, responsavel, emai
             type="text"
             value={emailTelefone}
             onChange={(e) => onChange('emailTelefone', e.target.value)}
+            readOnly={bloqueado}
             placeholder="cliente@email.com"
-            style={inputStyle}
+            style={{ ...inputStyle, opacity: bloqueado ? 0.7 : 1 }}
             className="px-[11px] py-2 text-[var(--text)] outline-none focus:border-[var(--green)] w-full"
           />
         </div>
