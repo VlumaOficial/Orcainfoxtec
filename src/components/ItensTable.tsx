@@ -4,8 +4,10 @@ import { parseBR, fmtBR, clamp99 } from '../lib/numeros'
 import type { Produto } from '../hooks/useProdutos'
 import type { CSSProperties } from 'react'
 import ProdutoCombobox from './ProdutoCombobox'
+import type { ConfigGlobal } from '../hooks/useConfigGlobal'
 
 interface Props {
+  config: ConfigGlobal
   itens: ItemOrcamento[]
   onAdicionar: () => void
   onRemover: (id: string) => void
@@ -115,6 +117,7 @@ const cv: CSSProperties = {
 }
 
 export default function ItensTable({
+  config,
   itens,
   onAdicionar,
   onRemover,
@@ -150,15 +153,17 @@ export default function ItensTable({
           <tbody>
             {itens.map((item, idx) => {
               const custoTotal = item.qtd * item.custoUnit
-              const margPct = clamp99(item.usaMargGlobal ? 0 : item.margPct)
+              const margPct = clamp99(item.usaMargGlobal ? config.margPct : item.margPct)
               const margemRS = custoTotal * (margPct / 100)
               const baseAntesImposto = custoTotal + margemRS
-              const impPct = clamp99(item.usaImpGlobal ? 0 : item.impPct)
+              const impPct = clamp99(item.usaImpGlobal ? config.impPct : item.impPct)
               const precoTabela = impPct > 0 ? baseAntesImposto / (1 - impPct / 100) : baseAntesImposto
               let descVal = 0
-              if (!item.usaDescGlobal) {
-                const descPctClamped = clamp99(item.descPct)
-                descVal = item.descFix > 0 ? Math.min(item.descFix, precoTabela) : precoTabela * (descPctClamped / 100)
+              const descPctEfetivo = item.usaDescGlobal ? config.descPct : item.descPct
+              if (item.descFix > 0 && !item.usaDescGlobal) {
+                descVal = Math.min(item.descFix, precoTabela)
+              } else {
+                descVal = precoTabela * (clamp99(descPctEfetivo) / 100)
               }
               const total = precoTabela - descVal
               const comImposto = total * (impPct / 100)

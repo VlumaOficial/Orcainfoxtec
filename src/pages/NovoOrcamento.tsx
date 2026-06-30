@@ -4,6 +4,8 @@ import EmitCard from '../components/EmitCard'
 import ClienteSection from '../components/ClienteSection'
 import ItensTable from '../components/ItensTable'
 import { useItensOrcamento } from '../hooks/useItensOrcamento'
+import ConfiguracoesSidebar from '../components/ConfiguracoesSidebar'
+import { useConfigGlobal } from '../hooks/useConfigGlobal'
 import { useNovoOrcamento } from '../hooks/useNovoOrcamento'
 
 const sectionStyle: CSSProperties = {
@@ -60,6 +62,7 @@ export default function NovoOrcamento() {
     carregandoNumero,
   } = useNovoOrcamento()
   const itensState = useItensOrcamento()
+  const configState = useConfigGlobal()
 
   return (
     <Layout>
@@ -153,6 +156,7 @@ export default function NovoOrcamento() {
           <div style={sectionStyle}>
             <SectionHeader color="g">Itens / Servicos</SectionHeader>
             <ItensTable
+              config={configState.config}
               itens={itensState.itens}
               buscaPorItem={itensState.buscaPorItem}
               onAdicionar={itensState.adicionarItem}
@@ -201,14 +205,10 @@ export default function NovoOrcamento() {
         </div>
 
         <div className="lg:sticky lg:top-6 self-start flex flex-col gap-5">
-          <div style={sectionStyle}>
-            <h2 className="text-[var(--text3)] text-[10px] font-bold uppercase tracking-widest mb-3">
-              Configuracoes
-            </h2>
-            <p className="text-[var(--text3)] text-sm">
-              Imposto, margem, desconto - em breve
-            </p>
-          </div>
+          <ConfiguracoesSidebar
+            config={configState.config}
+            onAtualizar={configState.atualizar}
+          />
 
           <div style={sectionStyle}>
             <h2 className="text-[var(--text3)] text-[10px] font-bold uppercase tracking-widest mb-3">
