@@ -207,7 +207,7 @@ export default function ItensTable({
                         step="1"
                         value={item.qtd}
                         onChange={(e) => onAtualizar(item.id, 'qtd', parseFloat(e.target.value) || 0)}
-                        style={{ background: 'var(--navy3)', border: '1px solid transparent', borderRadius: '6px', fontFamily: 'var(--mono)', fontSize: '12px', width: '34px', textAlign: 'center', padding: '6px 2px' }}
+                        style={{ background: 'var(--navy3)', border: '1px solid transparent', borderRadius: '6px', fontFamily: 'var(--mono)', fontSize: '12px', width: '56px', textAlign: 'center', padding: '6px 4px' }}
                         className="outline-none focus:border-[var(--green)]"
                       />
                       <button
@@ -219,7 +219,7 @@ export default function ItensTable({
                     </div>
                   </td>
 
-                  <td style={{ ...td, minWidth: '92px' }}>
+                  <td style={{ ...td, width: '110px', maxWidth: '110px' }}>
                     <div style={{ position: 'relative' }}>
                       <span className="pointer-events-none" style={{ position: 'absolute', left: '7px', top: '50%', transform: 'translateY(-50%)', fontSize: '11px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>R$</span>
                       <CustoInput

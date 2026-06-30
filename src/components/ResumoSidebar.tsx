@@ -79,6 +79,10 @@ export default function ResumoSidebar({ itens, config }: Props) {
       </h2>
 
       <div style={blockStyle}>
+        <div style={{ ...rowStyle, paddingTop: 0, paddingBottom: '10px', marginBottom: '4px', borderBottom: '1px solid var(--border2)' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text)', fontWeight: 600 }}>Total a Cobrar</span>
+          <span style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: '17px', color: 'var(--green)' }}>{temCusto ? fmtBR(t.tFinal) : '—'}</span>
+        </div>
         <div style={rowStyle}>
           <span style={lblStyle}>Total de custos</span>
           <span style={valStyle}>{temCusto ? fmtBR(t.tCusto) : '—'}</span>
