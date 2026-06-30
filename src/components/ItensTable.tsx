@@ -142,7 +142,7 @@ export default function ItensTable({
               <th style={thL}>Custo Unit.</th>
               <th style={thC}>Imp-Marg-Desc</th>
               <th style={th}>Custo Total</th>
-              <th style={th}>Preco Tabela</th>
+              <th style={th}>Preco Cheio</th>
               <th style={th}>Desconto</th>
               <th style={th}>C/ Imposto</th>
               <th style={th}>Lucro</th>
