@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Clientes from './pages/Clientes'
 import Produtos from './pages/Produtos'
+import Orcamentos from './pages/Orcamentos'
 import NovoOrcamento from './pages/NovoOrcamento'
 
 function RotaProtegida({ children }: { children: React.ReactNode }) {
@@ -75,6 +76,14 @@ function App() {
           element={
             <RotaProtegida>
               <Produtos />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/orcamentos"
+          element={
+            <RotaProtegida>
+              <Orcamentos />
             </RotaProtegida>
           }
         />
