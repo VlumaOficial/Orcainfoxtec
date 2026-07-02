@@ -95,6 +95,14 @@ function App() {
             </RotaProtegida>
           }
         />
+        <Route
+          path="/orcamentos/:id"
+          element={
+            <RotaProtegida>
+              <NovoOrcamento />
+            </RotaProtegida>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

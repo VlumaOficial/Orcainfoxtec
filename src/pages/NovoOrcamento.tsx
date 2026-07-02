@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import type { CSSProperties, ReactNode } from 'react'
 import Layout from '../components/Layout'
 import EmitCard from '../components/EmitCard'
@@ -10,6 +11,7 @@ import ResumoSidebar from '../components/ResumoSidebar'
 import { useConfigGlobal } from '../hooks/useConfigGlobal'
 import { useNovoOrcamento } from '../hooks/useNovoOrcamento'
 import { useSalvarOrcamento } from '../hooks/useSalvarOrcamento'
+import { carregarOrcamento } from '../hooks/useCarregarOrcamento'
 
 const sectionStyle: CSSProperties = {
   background: 'var(--navy2)',
@@ -47,7 +49,10 @@ function SectionHeader({ children, color }: { children: ReactNode; color: 'g' | 
 }
 
 export default function NovoOrcamento() {
+  const { id: orcamentoId } = useParams<{ id: string }>()
+  const modoEdicao = Boolean(orcamentoId)
   const {
+    carregar: carregarCabecalhoCliente,
     cabecalho,
     atualizarCampo,
     cliente,
@@ -63,17 +68,20 @@ export default function NovoOrcamento() {
     usarClienteAvulso,
     desvincularCliente,
     carregandoNumero,
-  } = useNovoOrcamento()
+  } = useNovoOrcamento(modoEdicao)
 
   async function handleSalvar() {
-    const id = await salvar({
+    const dados = {
       cabecalho,
       cliente,
       clienteVinculado,
       clienteAvulso,
       itens: itensState.itens,
       config: configState.config,
-    })
+    }
+    const id = modoEdicao && orcamentoId
+      ? await atualizar(orcamentoId, dados, statusAtual)
+      : await salvar(dados)
     if (id) {
       setSalvoOk(true)
       setTimeout(() => setSalvoOk(false), 3000)
@@ -82,11 +90,46 @@ export default function NovoOrcamento() {
 
   const itensState = useItensOrcamento()
   const configState = useConfigGlobal()
-  const { salvar, salvando, erro } = useSalvarOrcamento()
+  const { salvar, atualizar, salvando, erro } = useSalvarOrcamento()
   const [salvoOk, setSalvoOk] = useState(false)
+  const [statusAtual, setStatusAtual] = useState<string>('rascunho')
+  const [carregandoEdicao, setCarregandoEdicao] = useState(modoEdicao)
+
+  useEffect(() => {
+    if (!orcamentoId) return
+    let ativo = true
+    async function carregar() {
+      const dados = await carregarOrcamento(orcamentoId!)
+      if (!ativo) return
+      if (dados) {
+        carregarCabecalhoCliente(dados.cabecalho, dados.cliente, dados.clienteVinculado, dados.clienteAvulso)
+        itensState.carregar(dados.itens)
+        configState.carregar(dados.config)
+        setStatusAtual(dados.status)
+      }
+      setCarregandoEdicao(false)
+    }
+    carregar()
+    return () => { ativo = false }
+  }, [orcamentoId])
+
+  if (carregandoEdicao) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20 text-[var(--text2)]">
+          Carregando orcamento...
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>
+      {modoEdicao && (
+        <div className="mb-4 text-[var(--text2)] text-sm">
+          Editando orcamento • status atual: <span className="text-[var(--text)] font-medium">{statusAtual}</span>
+        </div>
+      )}
       <EmitCard
         emailContato={cabecalho.emailContato}
         telefoneContato={cabecalho.telefoneContato}
