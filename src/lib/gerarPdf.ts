@@ -108,8 +108,18 @@ export function gerarPdf(dados: DadosPdf) {
       try {
         doc.addImage(logoBase64, 'JPEG', MG, 11, 52, 22)
       } catch {
-        // ignora
+        // Sem logo valida: mostra o nome da empresa no lugar
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(15)
+        doc.setTextColor(255, 255, 255)
+        doc.text((empresa?.nome || 'Minha Empresa').toUpperCase(), MG, 26, { maxWidth: 110 })
       }
+    } else {
+      // Sem logo: nome da empresa preenche o espaco a esquerda (em branco, destacado)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(15)
+      doc.setTextColor(255, 255, 255)
+      doc.text((empresa?.nome || 'Minha Empresa').toUpperCase(), MG, 26, { maxWidth: 110 })
     }
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(11)
