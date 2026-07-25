@@ -17,7 +17,7 @@ import ModalDivergencias from '../components/ModalDivergencias'
 import { detectarDivergencias } from '../lib/detectarDivergencias'
 import type { Divergencia } from '../lib/detectarDivergencias'
 import { gerarPdf } from '../lib/gerarPdf'
-import logoInfoxtec from '../assets/infoxtec-logo.jpeg'
+import { useEmpresa } from '../hooks/useEmpresa'
 
 const sectionStyle: CSSProperties = {
   background: 'var(--navy2)',
@@ -133,18 +133,20 @@ export default function NovoOrcamento() {
   }
 
   async function handleGerarPdf() {
-    // Converte o logo (asset) para base64 para embutir no PDF
+    // Logo da empresa logada (se houver logo_url). Sem logo -> PDF usa so o nome.
     let logoBase64: string | undefined
-    try {
-      const resp = await fetch(logoInfoxtec)
-      const blob = await resp.blob()
-      logoBase64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.readAsDataURL(blob)
-      })
-    } catch {
-      logoBase64 = undefined
+    if (empresa?.logo_url) {
+      try {
+        const resp = await fetch(empresa.logo_url)
+        const blob = await resp.blob()
+        logoBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(blob)
+        })
+      } catch {
+        logoBase64 = undefined
+      }
     }
     gerarPdf({
       cabecalho,
@@ -152,6 +154,9 @@ export default function NovoOrcamento() {
       itens: itensState.itens,
       config: configState.config,
       logoBase64,
+      empresa: empresa
+        ? { nome: empresa.nome, cnpj: empresa.cnpj, endereco: empresa.endereco }
+        : undefined,
     })
   }
 
@@ -167,6 +172,7 @@ export default function NovoOrcamento() {
 
   const itensState = useItensOrcamento()
   const configState = useConfigGlobal()
+  const { empresa } = useEmpresa()
   const { salvar, atualizar, mudarStatus, atualizarCatalogo, salvando, erro } = useSalvarOrcamento()
   const [salvoOk, setSalvoOk] = useState(false)
   const [mostrarPosSalvar, setMostrarPosSalvar] = useState(false)

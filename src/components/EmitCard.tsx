@@ -1,4 +1,4 @@
-import logo from '../assets/infoxtec-logo.jpeg'
+import { useEmpresa } from '../hooks/useEmpresa'
 
 interface Props {
   emailContato: string
@@ -8,6 +8,8 @@ interface Props {
 }
 
 export default function EmitCard({ emailContato, telefoneContato, onChangeEmail, onChangeTelefone }: Props) {
+  const { empresa } = useEmpresa()
+
   return (
     <div
       className="flex gap-5 items-start mb-5 p-4 sm:p-5"
@@ -18,18 +20,23 @@ export default function EmitCard({ emailContato, telefoneContato, onChangeEmail,
         borderRadius: '14px',
       }}
     >
-      <img src={logo} alt="Infoxtec" className="h-9 w-auto rounded hidden sm:block" />
+      {empresa?.logo_url && (
+        <img src={empresa.logo_url} alt={empresa?.nome || 'Empresa'} className="h-9 w-auto rounded hidden sm:block" />
+      )}
       <div className="flex-1">
         <div className="font-sora font-bold text-[13px] text-[var(--text)] mb-0.5">
-          INFOXTEC TECNOLOGIA E SERVICOS LTDA
+          {empresa?.nome || 'Minha Empresa'}
         </div>
-        <div className="text-[var(--text2)] text-xs">
-          CNPJ: 04.309.223/0001-96
-        </div>
-        <div className="text-[var(--text2)] text-xs mb-3">
-          Rua Silveira Martins, no 27, Cabula - CEP 41150-000, Salvador/BA
-        </div>
-
+        {empresa?.cnpj && (
+          <div className="text-[var(--text2)] text-xs">
+            CNPJ: {empresa.cnpj}
+          </div>
+        )}
+        {empresa?.endereco && (
+          <div className="text-[var(--text2)] text-xs mb-3">
+            {empresa.endereco}
+          </div>
+        )}
         <div className="flex gap-3.5 flex-wrap">
           <div className="flex flex-col gap-[3px]">
             <label className="text-[10px] uppercase tracking-wide text-[var(--text3)]">
@@ -52,7 +59,7 @@ export default function EmitCard({ emailContato, telefoneContato, onChangeEmail,
               type="text"
               value={emailContato}
               onChange={(e) => onChangeEmail(e.target.value)}
-              placeholder="contato@infoxtec.com.br"
+              placeholder="contato@empresa.com.br"
               style={{ background: 'var(--navy4)', border: '1px solid var(--border2)', borderRadius: '6px', width: '190px', fontSize: '12px' }}
               className="px-2.5 py-1.5 text-[var(--text)] outline-none focus:border-[var(--green)]"
             />

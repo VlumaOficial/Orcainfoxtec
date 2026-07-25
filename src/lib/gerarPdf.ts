@@ -12,6 +12,7 @@ interface DadosPdf {
   itens: ItemOrcamento[]
   config: ConfigGlobal
   logoBase64?: string
+  empresa?: { nome: string; cnpj: string | null; endereco: string | null }
 }
 
 function fmtData(iso: string): string {
@@ -37,7 +38,7 @@ const CINZA: [number, number, number] = [90, 100, 115]
 const CINZA_CL: [number, number, number] = [200, 210, 225]
 
 export function gerarPdf(dados: DadosPdf) {
-  const { cabecalho, cliente, itens, config, logoBase64 } = dados
+  const { cabecalho, cliente, itens, config, logoBase64, empresa } = dados
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
@@ -156,12 +157,12 @@ export function gerarPdf(dados: DadosPdf) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(7.5)
     doc.setTextColor(...NAVY)
-    doc.text('INFOXTEC TECNOLOGIA E SERVIÇOS LTDA', MG + 4, y + 11, { maxWidth: cw - 8 })
+    doc.text((empresa?.nome || 'Minha Empresa').toUpperCase(), MG + 4, y + 11, { maxWidth: cw - 8 })
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(7)
     doc.setTextColor(...CINZA)
-    doc.text('CNPJ: 04.309.223/0001-96', MG + 4, y + 18)
-    doc.text('Rua Silveira Martins, 27, Cabula - 41150-000, Salvador/BA', MG + 4, y + 23, { maxWidth: cw - 8 })
+    if (empresa?.cnpj) doc.text('CNPJ: ' + empresa.cnpj, MG + 4, y + 18)
+    if (empresa?.endereco) doc.text(empresa.endereco, MG + 4, y + 23, { maxWidth: cw - 8 })
     if (contatoLinha) doc.text(contatoLinha, MG + 4, y + 29, { maxWidth: cw - 8 })
 
     const cx = MG + cw + 6
@@ -196,12 +197,11 @@ export function gerarPdf(dados: DadosPdf) {
     doc.setFontSize(6.5)
     doc.setTextColor(...CINZA_CL)
     // Linha 1: razao social + CNPJ
-    doc.text('Infoxtec Tecnologia e Serviços Ltda  .  CNPJ 04.309.223/0001-96', MG, yBase + 6)
+    doc.text((empresa?.nome || 'Minha Empresa') + (empresa?.cnpj ? '  .  CNPJ ' + empresa.cnpj : ''), MG, yBase + 6)
     // Linha 2: endereco
-    doc.text('Rua Silveira Martins, 27, Cabula - 41150-000, Salvador/BA', MG, yBase + 11)
+    if (empresa?.endereco) doc.text(empresa.endereco, MG, yBase + 11)
     // Site (direita, alinhado verticalmente ao centro do rodape)
     doc.setTextColor(...GREEN)
-    doc.text('infoxtec.com.br', PAGE_W - MG, yBase + 8.5, { align: 'right' })
   }
 
   // ── Calcula a altura estimada do bloco de fechamento (resumo + total + obs). ──
@@ -354,5 +354,5 @@ export function gerarPdf(dados: DadosPdf) {
     desenharRodape()
   }
 
-  doc.save('orcamento-' + (cabecalho.numero || 'infoxtec') + '.pdf')
+  doc.save('orcamento-' + (cabecalho.numero || 'orcamento') + '.pdf')
 }

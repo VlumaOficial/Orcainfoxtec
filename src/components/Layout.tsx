@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
-import logo from '../assets/infoxtec-logo.jpeg'
+import { useEmpresa } from '../hooks/useEmpresa'
 
 const menu = [
   {
@@ -47,6 +47,7 @@ const menu = [
 export default function Layout({ children }: { children: ReactNode }) {
   const { session } = useAuth()
   const location = useLocation()
+  const { empresa } = useEmpresa()
   const [menuAberto, setMenuAberto] = useState(false)
 
   // Colapso so e permitido na tela de Orcamento
@@ -87,7 +88,11 @@ export default function Layout({ children }: { children: ReactNode }) {
         }
       >
         <div className={"flex items-center mb-6 " + (efetivamenteColapsada ? "justify-center" : "justify-between")}>
-          {!efetivamenteColapsada && <img src={logo} alt="Infoxtec" className="h-8 w-fit rounded" />}
+          {!efetivamenteColapsada && (
+            empresa?.logo_url
+              ? <img src={empresa.logo_url} alt={empresa?.nome || 'Empresa'} className="h-8 w-fit rounded" />
+              : <span className="font-sora font-bold text-[15px] text-[var(--text)]">{empresa?.nome || 'Orçamentos'}</span>
+          )}
           {emOrcamento && (
           <button
             type="button"
@@ -153,7 +158,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         <div className="md:hidden flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <img src={logo} alt="Infoxtec" className="h-7 w-fit rounded" />
+          {empresa?.logo_url
+            ? <img src={empresa.logo_url} alt={empresa?.nome || 'Empresa'} className="h-7 w-fit rounded" />
+            : <span className="font-sora font-bold text-[14px] text-[var(--text)]">{empresa?.nome || 'Orçamentos'}</span>}
           <button
             onClick={() => setMenuAberto(true)}
             className="text-[var(--text)] p-2"

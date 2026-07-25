@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
-import logo from '../assets/infoxtec-logo.jpeg'
 
 const beneficios = [
   {
@@ -48,7 +47,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[var(--navy)]">
       <div className="hidden md:flex flex-col justify-center px-16 w-1/2 border-r border-[var(--border)]">
-        <img src={logo} alt="Infoxtec" className="h-10 w-fit mb-8 rounded" />
+        <div className="font-sora font-bold text-3xl text-[var(--text)] mb-8">Orçamentos</div>
         <p className="text-[var(--text2)] text-lg mb-10">
           Orçamentos certos, sempre
         </p>
@@ -66,7 +65,7 @@ export default function Login() {
 
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-          <img src={logo} alt="Infoxtec" className="h-9 w-fit mb-8 md:hidden rounded" />
+          <div className="font-sora font-bold text-2xl text-[var(--text)] mb-8 md:hidden">Orçamentos</div>
           <h1 className="text-[var(--text)] text-2xl font-semibold mb-1">
             Bem-vindo de volta
           </h1>
